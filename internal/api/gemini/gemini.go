@@ -8,10 +8,10 @@ import (
 	"net/url"
 	"time"
 
-	httpclient "github.com/estifanos-neway/CLC/pkg/http-client"
+	httpclient "github.com/estifanos-neway/CLC/internal/pkg/http-client"
 )
 
-func (m *Message) Send() (*Content, error) {
+func (m *Message) Send() (*Response, error) {
 	url, err := url.Parse(m.Url)
 	if err != nil {
 		return nil, err
@@ -43,10 +43,21 @@ func (m *Message) Send() (*Content, error) {
 		return nil, fmt.Errorf("error from ai model : %s", res.Status)
 	}
 
-	var content Content
-	if err := json.NewDecoder(res.Body).Decode(&content); err != nil {
+	var messageResponse Response
+	if err := json.NewDecoder(res.Body).Decode(&messageResponse); err != nil {
 		return nil, err
 	}
 
-	return &content, nil
+	return &messageResponse, nil
+}
+
+func CreateContent(role Role, text string) *Content {
+	return &Content{
+		Role: role,
+		Parts: []*Part{
+			&Part{
+				Text: text,
+			},
+		},
+	}
 }

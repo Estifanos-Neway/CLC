@@ -1,0 +1,9 @@
+gemini:
+  url: ""
+  appKey: ""
+  generationConfig:
+    temperature: 0.95
+    topK: 40
+    topP: 1
+    maxOutputTokens: 10000
+    responseMimeType: "application/json"
