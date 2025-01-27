@@ -34,7 +34,7 @@ type ToolCheck struct {
 }
 
 type OkIf struct {
-	OkExistCode string `json:"okExistCode"` // "true | false"
+	OkExistCode bool   `json:"okExistCode"` // true|false
 	RegExp      string `json:"regExp"`
 }
 

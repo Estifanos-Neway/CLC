@@ -40,7 +40,7 @@ func (m *Message) Send() (*Response, error) {
 
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("error from ai model : %s", res.Status)
+		return nil, fmt.Errorf("error from the ai api : %s", res.Status)
 	}
 
 	var messageResponse Response
@@ -55,7 +55,7 @@ func CreateContent(role Role, text string) *Content {
 	return &Content{
 		Role: role,
 		Parts: []*Part{
-			&Part{
+			{
 				Text: text,
 			},
 		},

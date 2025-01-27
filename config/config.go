@@ -14,21 +14,6 @@ var (
 	v          *validator.Validate
 )
 
-// Configuration values
-type appConfig struct {
-	Gemini struct {
-		ApiKey           string `yaml:"apiKey" validate:"required"`
-		Url              string `yaml:"url" validate:"required"`
-		GenerationConfig struct {
-			Temperature      float32 `yaml:"temperature"`
-			TopK             int     `yaml:"topK"`
-			TopP             float32 `yaml:"topP"`
-			MaxOutputTokens  int     `yaml:"maxOutputTokens"`
-			ResponseMimeType string  `yaml:"responseMimeType"`
-		} `yaml:"generationConfig" validate:"required"`
-	} `yaml:"gemini" validate:"required"`
-}
-
 var AppConfig *appConfig
 
 func Load() error {
