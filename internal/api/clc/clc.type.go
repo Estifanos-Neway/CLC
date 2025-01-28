@@ -1,4 +1,4 @@
-package CLC
+package clc
 
 import "github.com/estifanos-neway/CLC/internal/api/gemini"
 

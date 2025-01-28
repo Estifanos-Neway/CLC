@@ -1,4 +1,4 @@
-package CLC
+package clc
 
 const (
 	ReasonOK           Reason = "OK"

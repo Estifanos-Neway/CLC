@@ -1,4 +1,4 @@
-package CLC
+package clc
 
 import (
 	"encoding/json"
@@ -54,3 +54,12 @@ func (c *CLC) GetResponse() error {
 
 	return nil
 }
+
+func (r *Response) String() string {
+	text, err := json.MarshalIndent(r, "->", "-")
+	if err != nil {
+		panic(err)
+	}
+	return string(text)
+}
+	
