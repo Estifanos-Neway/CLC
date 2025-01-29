@@ -3,7 +3,9 @@ package gemini
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
@@ -40,7 +42,9 @@ func (m *Message) Send() (*Response, error) {
 
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("error from the ai api : %s", res.Status)
+		errMsg := fmt.Sprintf("error from the ai api : %s", res.Status)
+		slog.Debug(errMsg, "req", string(msgJson)) // TODO Add "res"
+		return nil, errors.New(errMsg)
 	}
 
 	var messageResponse Response

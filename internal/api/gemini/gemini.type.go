@@ -1,8 +1,8 @@
 package gemini
 
 type Gemini struct {
-	Url    string
-	ApiKey string
+	Url    string `json:"-"`
+	ApiKey string `json:"-"`
 }
 
 type Chat struct {

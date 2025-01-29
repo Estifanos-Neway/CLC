@@ -48,18 +48,28 @@ func (c *CLC) GetResponse() error {
 	}
 
 	resText := res.Candidates[0].Content.Parts[0].Text
+	c.Response = &Response{}
 	if err := json.Unmarshal([]byte(resText), c.Response); err != nil {
-		return nil
+		return err
 	}
 
 	return nil
 }
 
+func (c *CLC) Print() {
+	fmt.Println(c.Response)
+}
+
+func (c *CLC) Exec() error {
+	fmt.Println("Exec: not implemented!")
+	return nil
+}
+
 func (r *Response) String() string {
-	text, err := json.MarshalIndent(r, "->", "-")
+	// TODO Implement better formatted string
+	text, err := json.MarshalIndent(r, "", " ")
 	if err != nil {
 		panic(err)
 	}
 	return string(text)
 }
-	
