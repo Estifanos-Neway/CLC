@@ -7,12 +7,20 @@ import (
 
 	"github.com/estifanos-neway/CLC/config"
 	"github.com/estifanos-neway/CLC/internal/api/gemini"
+	"github.com/estifanos-neway/CLC/internal/pkg/dir"
 )
 
 func (c *CLC) GetResponse() error {
+	dirContents, err := dir.GetDirectoryContents(".")
+	if err != nil {
+		return err
+	}
 	msgContent := request{
-		HostMachine: runtime.GOOS,
-		Prompt:      c.Prompt,
+		Prompt: c.Prompt,
+		Context: Context{
+			HostMachine:      runtime.GOOS, // TODO Add better host machine details
+			CurrentDirContent: *dirContents,
+		},
 	}
 
 	msgContentText, err := json.Marshal(msgContent)

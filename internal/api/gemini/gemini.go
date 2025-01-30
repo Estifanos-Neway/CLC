@@ -41,14 +41,21 @@ func (m *Message) Send() (*Response, error) {
 	}
 
 	defer res.Body.Close()
+	resBodyDecoder := json.NewDecoder(res.Body)
 	if res.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("error from the ai api : %s", res.Status)
-		slog.Debug(errMsg, "req", string(msgJson)) // TODO Add "res"
+
+		var errRes ErrorResponse
+		if err := resBodyDecoder.Decode(&errRes); err != nil {
+			return nil, err
+		}
+
+		slog.Debug(errMsg, "req", m, "res", errRes)
 		return nil, errors.New(errMsg)
 	}
 
 	var messageResponse Response
-	if err := json.NewDecoder(res.Body).Decode(&messageResponse); err != nil {
+	if err := resBodyDecoder.Decode(&messageResponse); err != nil {
 		return nil, err
 	}
 

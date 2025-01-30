@@ -9,8 +9,13 @@ type CLC struct {
 }
 
 type request struct {
-	HostMachine string `json:"hostMachine"`
-	Prompt      string `json:"prompt"`
+	Prompt  string  `json:"prompt"`
+	Context Context `json:"context"`
+}
+
+type Context struct {
+	HostMachine       string   `json:"hostMachine"`
+	CurrentDirContent []string `json:"currentDirContent"`
 }
 
 type Response struct {
