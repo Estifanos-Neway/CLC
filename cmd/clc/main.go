@@ -46,7 +46,10 @@ func main() {
 
 	switch {
 	case *printCmds:
-		clc.Print()
+		fmt.Fprintln(os.Stdout)
+		if err := clc.PrintSimple(os.Stdout); err != nil {
+			display.ExitOnError(err, display.MsgTryAgain)
+		}
 	default:
 		clc.Exec()
 	}

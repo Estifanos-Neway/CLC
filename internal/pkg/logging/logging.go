@@ -9,6 +9,7 @@ import (
 
 func ConfigureLogging() {
 	// TODO Create slog.Temp()
+	// TODO Implement indented json logging
 	logLevel := slog.LevelDebug
 	if config.AppConfig.Environment == config.EnvironmentProd {
 		logLevel = 10
