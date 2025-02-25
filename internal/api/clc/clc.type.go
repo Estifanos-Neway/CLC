@@ -53,17 +53,4 @@ type Cmd struct {
 	Description string `json:"description"`
 }
 
-type PrintableLengths struct {
-	Tool        int
-	Command     int
-	Description int
-	IfNotFound  int
-}
-
-type PrintableResponse struct {
-	ToolCheckPrintableLengths *PrintableLengths
-	CommandsPrintableLengths  *PrintableLengths
-	Response                  *Response
-}
-
 type Reason string
