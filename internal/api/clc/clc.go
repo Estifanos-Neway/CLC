@@ -4,16 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
 	"runtime"
 	"text/tabwriter"
 
 	"github.com/estifanos-neway/CLC/config"
 	"github.com/estifanos-neway/CLC/internal/api/gemini"
-	"github.com/estifanos-neway/CLC/internal/pkg/dir"
 )
 
 func (c *CLC) GetResponse() error {
-	dirContents, err := dir.GetDirectoryContents(".")
+	dirContents, err := filepath.Glob("." + "/*")
 	if err != nil {
 		return err
 	}
@@ -21,7 +25,7 @@ func (c *CLC) GetResponse() error {
 		Prompt: c.Prompt,
 		Context: Context{
 			HostMachine:       runtime.GOOS, // TODO Add better host machine details
-			CurrentDirContent: *dirContents,
+			CurrentDirContent: dirContents,
 		},
 	}
 
@@ -85,6 +89,54 @@ func (c *CLC) Print(out io.Writer) error {
 }
 
 func (c *CLC) Exec() error {
-	fmt.Println("Exec: not implemented!")
+	if len(c.Response.Commands.ToolCheck) > 0 {
+		slog.Debug("Performing tool check...")
+		for _, i := range c.Response.Commands.ToolCheck {
+			slog.Debug(i.Description)
+			out, err := exec.Command(i.Cmd, i.Args...).Output()
+			if err != nil {
+				slog.Error("Error running tool check", "Error", err)
+				return err
+			}
+
+			if i.OkIf.OkExistCode {
+				continue
+			}
+
+			if i.OkIf.RegExp != "" {
+				match, err := regexp.MatchString(string(i.OkIf.RegExp), string(out))
+				if err != nil {
+					slog.Error("Error running regexp check", "Error", err)
+					return err
+				}
+				if match {
+					continue
+				}
+			}
+			fmt.Fprintln(os.Stdout, i.OnFail.ToolNotFoundMessage)
+			fmt.Fprintln(os.Stdout, "#", i.OnFail.InstructionToInstall)
+			return fmt.Errorf(i.OnFail.ToolNotFoundMessage)
+		}
+	}
+	slog.Debug("Executing cmd...")
+	for _, i := range c.Response.Commands.Cmds {
+		slog.Debug(i.Description)
+		out, err := exec.Command(i.Cmd, i.Args...).Output()
+		if err != nil {
+			slog.Error("Error running cmd", "Error", err)
+			return err
+		}
+
+		fmt.Fprintln(os.Stdout, string(out))
+	}
 	return nil
+}
+
+func (r *Response) String() string {
+	// TODO Implement better formatted string
+	text, err := json.MarshalIndent(r, "", " ")
+	if err != nil {
+		panic(err)
+	}
+	return string(text)
 }

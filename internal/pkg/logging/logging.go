@@ -12,7 +12,7 @@ func ConfigureLogging() {
 	// TODO Implement indented json logging
 	logLevel := slog.LevelDebug
 	if config.AppConfig.Environment == config.EnvironmentProd {
-		logLevel = 10
+		logLevel = 8
 	}
 
 	logHandlerOptions := slog.HandlerOptions{

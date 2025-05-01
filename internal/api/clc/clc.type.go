@@ -31,11 +31,12 @@ type Commands struct {
 }
 
 type ToolCheck struct {
-	Tool        string  `json:"tool"`
-	Description string  `json:"description"`
-	Cmd         string  `json:"cmd"`
-	OkIf        *OkIf   `json:"okIf"`
-	OnFail      *OnFail `json:"onFail"`
+	Tool        string   `json:"tool"`
+	Description string   `json:"description"`
+	Cmd         string   `json:"cmd"`
+	Args        []string `json:"args"`
+	OkIf        *OkIf    `json:"okIf"`
+	OnFail      *OnFail  `json:"onFail"`
 }
 
 type OkIf struct {
@@ -49,8 +50,9 @@ type OnFail struct {
 }
 
 type Cmd struct {
-	Cmd         string `json:"cmd"`
-	Description string `json:"description"`
+	Cmd         string   `json:"cmd"`
+	Args        []string `json:"args"`
+	Description string   `json:"description"`
 }
 
 type Reason string

@@ -19,7 +19,7 @@ func main() {
 		display.ExitOnError(fmt.Errorf("unable to load app configuration \n %s", err), display.MsgTryAgain)
 	}
 	logging.ConfigureLogging()
-	slog.Info("Logger configured.")
+	slog.Debug("Logger configured.")
 
 	printCmds := flag.Bool("p", false, "If set to true, the commands will be printed instead of being executed.")
 	flag.Parse()
@@ -42,6 +42,13 @@ func main() {
 
 	if err := clc.GetResponse(); err != nil {
 		display.ExitOnError(err, display.MsgTryAgain)
+	}
+
+	if clc.Response.Status == 0 {
+		// TODO Make the output red
+		slog.Error(string(clc.Response.Reason), "Message", clc.Response.Message)
+		fmt.Fprintln(os.Stdout, "#", clc.Response.Message)
+		return
 	}
 
 	switch {
