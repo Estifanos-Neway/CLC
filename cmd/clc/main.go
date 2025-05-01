@@ -21,7 +21,8 @@ func main() {
 	logging.ConfigureLogging()
 	slog.Debug("Logger configured.")
 
-	printCmds := flag.Bool("p", false, "If set to true, the commands will be printed instead of being executed.")
+	skipExecution := flag.Bool("s", false, "If set to true, the execution of the script file skipped.")
+	keepScript := flag.Bool("k", false, "If set to true, the script file will be kept.")
 	flag.Parse()
 
 	prompt := strings.Join(flag.Args(), " ")
@@ -51,14 +52,7 @@ func main() {
 		return
 	}
 
-	switch {
-	case *printCmds:
-		fmt.Fprintln(os.Stdout)
-		if err := clc.Print(os.Stdout); err != nil {
-			display.ExitOnError(err, display.MsgTryAgain)
-		}
-	default:
-		clc.Exec()
+	if err := clc.Go(*keepScript, *skipExecution); err != nil {
+		display.ExitOnError(err, display.MsgTryAgain)
 	}
-
 }

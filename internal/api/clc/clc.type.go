@@ -26,33 +26,9 @@ type Response struct {
 }
 
 type Commands struct {
-	ToolCheck []*ToolCheck `json:"toolCheck"`
-	Cmds      []*Cmd       `json:"cmds"`
-}
-
-type ToolCheck struct {
-	Tool        string   `json:"tool"`
-	Description string   `json:"description"`
-	Cmd         string   `json:"cmd"`
-	Args        []string `json:"args"`
-	OkIf        *OkIf    `json:"okIf"`
-	OnFail      *OnFail  `json:"onFail"`
-}
-
-type OkIf struct {
-	OkExistCode bool   `json:"okExistCode"` // true|false
-	RegExp      string `json:"regExp"`
-}
-
-type OnFail struct {
-	ToolNotFoundMessage  string `json:"toolNotFoundMessage"`
-	InstructionToInstall string `json:"instructionToInstall"`
-}
-
-type Cmd struct {
-	Cmd         string   `json:"cmd"`
-	Args        []string `json:"args"`
-	Description string   `json:"description"`
+	ScriptContent string `json:"scriptContent"`
+	FileExtension string `json:"fileExtension"`
+	Runner string `json:"runner"`
 }
 
 type Reason string

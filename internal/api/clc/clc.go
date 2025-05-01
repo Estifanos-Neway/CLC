@@ -3,14 +3,11 @@ package clc
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
-	"text/tabwriter"
 
 	"github.com/estifanos-neway/CLC/config"
 	"github.com/estifanos-neway/CLC/internal/api/gemini"
@@ -70,64 +67,44 @@ func (c *CLC) GetResponse() error {
 	return nil
 }
 
-func (c *CLC) Print(out io.Writer) error {
-	w := tabwriter.NewWriter(out, 5, 1, 3, ' ', 0)
-	fmt.Fprintln(w, "\033[5;32m1. Check for required tools 🧪\033[0m")
-	fmt.Fprint(w, "| Tool\t| Command\t| Description\t| If Not Found\t|\t\n")
-	for _, t := range c.Response.Commands.ToolCheck {
-		fmt.Fprintf(w, "| %s\t| %s\t| %s\t| %s\t|\t\n", t.Tool, t.Cmd, t.Description, t.OnFail.InstructionToInstall)
+func (c *CLC) Go(keep bool, skip bool) error {
+	slog.Debug("Creating script file...")
+	scriptName := fmt.Sprintf("./clc-script%s", c.Response.Commands.FileExtension)
+	f, err := os.Create(scriptName)
+	if err != nil {
+		slog.Error("Error creating script file", "Error", err)
+		return err
 	}
+	defer f.Close()
+	slog.Debug("Script file created.")
 
-	fmt.Fprintln(w)
-	fmt.Fprintln(w, "\033[5;32m2. Execute these commands 🚀\033[0m")
-	fmt.Fprint(w, "| Command\t| Description\t|\t\n")
-	for _, cmd := range c.Response.Commands.Cmds {
-		fmt.Fprintf(w, "| %s\t| %s \t|\t\n", cmd.Cmd, cmd.Description)
+	slog.Debug("Writing script file...")
+	if _, err := f.WriteString(c.Response.Commands.ScriptContent); err != nil {
+		slog.Error("Error writing script file", "Error", err)
+		return err
 	}
+	slog.Debug("Wrote script file.")
 
-	return w.Flush()
-}
-
-func (c *CLC) Exec() error {
-	if len(c.Response.Commands.ToolCheck) > 0 {
-		slog.Debug("Performing tool check...")
-		for _, i := range c.Response.Commands.ToolCheck {
-			slog.Debug(i.Description)
-			out, err := exec.Command(i.Cmd, i.Args...).Output()
-			if err != nil {
-				slog.Error("Error running tool check", "Error", err)
-				return err
-			}
-
-			if i.OkIf.OkExistCode {
-				continue
-			}
-
-			if i.OkIf.RegExp != "" {
-				match, err := regexp.MatchString(string(i.OkIf.RegExp), string(out))
-				if err != nil {
-					slog.Error("Error running regexp check", "Error", err)
-					return err
-				}
-				if match {
-					continue
-				}
-			}
-			fmt.Fprintln(os.Stdout, i.OnFail.ToolNotFoundMessage)
-			fmt.Fprintln(os.Stdout, "#", i.OnFail.InstructionToInstall)
-			return fmt.Errorf(i.OnFail.ToolNotFoundMessage)
-		}
-	}
-	slog.Debug("Executing cmd...")
-	for _, i := range c.Response.Commands.Cmds {
-		slog.Debug(i.Description)
-		out, err := exec.Command(i.Cmd, i.Args...).Output()
+	if !skip {
+		out, err := exec.Command(c.Response.Commands.Runner, scriptName).Output()
 		if err != nil {
-			slog.Error("Error running cmd", "Error", err)
+			slog.Error("Error running exec command", "Error", err)
 			return err
 		}
+		slog.Debug("Script file executed.")
+		fmt.Println(string(out))
+	}
+	slog.Debug("Script file executed.")
 
-		fmt.Fprintln(os.Stdout, string(out))
+	if !keep {
+		slog.Debug("Removing script file...")
+		if err := os.Remove(f.Name()); err != nil {
+			slog.Error("Error removing script file", "Error", err)
+			return err
+		}
+		slog.Debug("Script file removed.")
+	} else {
+		slog.Debug("Script file kept.")
 	}
 	return nil
 }
