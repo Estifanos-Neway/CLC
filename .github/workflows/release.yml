@@ -1,8 +1,7 @@
-# .github/workflows/release.yml
 name: goreleaser
 
 on:
-  pull_request:
+  # pull_request:
   push:
     # run only against tags
     tags:
@@ -25,11 +24,12 @@ jobs:
       - name: Git reset
         run: |
             git reset --hard
-            
+
       - name: Create config file from Github secret
         run: |
-          echo "$CONFIG_BASE64" | base64 --decode > \
+          echo "${{ secrets.CONFIG_BASE64 }}" | base64 --decode > \
           config/config.yaml
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
