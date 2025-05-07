@@ -4,4 +4,5 @@
 - Better doc
 - Better api-key management
 - Auth
+- Use Cobra
 

@@ -25,9 +25,10 @@ Linux) PLATFORM="Linux" ;;
 esac
 
 FILENAME="CLC_${PLATFORM}_${ARCH}.tar.gz"
-URL="https://github.com/$REPO/releases/download/v$VERSION/$FILENAME"
+URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
 
 echo "Downloading $FILENAME..."
+echo "Downloading $URL..."
 curl -L "$URL" -o "$TMP_DIR/clc.tar.gz"
 
 echo "Extracting..."
